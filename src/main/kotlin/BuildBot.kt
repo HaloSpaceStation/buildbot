@@ -39,14 +39,14 @@ val SshSessionFactory = object : JschConfigSessionFactory() {
     }
 
     override fun configure(hc: OpenSshConfig.Host?, session: Session?) {
-        session?.setConfig("StrictHostChecking", "no")
+        session?.setConfig("StrictHostKeyChecking", "no")
     }
 
 }
 
 data class PullBase(val ref: String)
-data class PullRequest(val state: String, val body: String, val merged: Boolean)
-data class PullRequestEvent(val action: String, val number: Int, val pull_request: PullRequest, val base: PullBase)
+data class PullRequest(val state: String, val body: String, val base: PullBase, val merged: Boolean)
+data class PullRequestEvent(val action: String, val pull_request: PullRequest, val number: Int)
 
 fun generateChangelog(repoPath: String) {
     val command = ProcessBuilder().command("python", "$repoPath/tools/GenerateChangelog/ss13_genchangelog.py", "$repoPath/html/changelog.html", "$repoPath/html/changelogs")
@@ -59,10 +59,6 @@ fun hmacMessage(body: String): String {
 
 fun main(args: Array<String>) {
     val hsRepo = FileRepositoryBuilder.create(File("repo/.git"))
-    val hsConfig = hsRepo.config
-    hsConfig.setString("core", null, "autocrlf", "true")
-    hsConfig.save()
-
     var hsGit: Git
 
     if(hsRepo.refDatabase.findRef("HEAD") == null) {
@@ -79,6 +75,9 @@ fun main(args: Array<String>) {
     hsGit = Git(hsRepo)
     hsGit.remoteAdd().setName("origin").setUri(URIish("git@github.com:HaloSpaceStation/HaloSpaceStation13.git")).call()
 
+    val hsConfig = hsRepo.config
+    hsConfig.setString("core", null, "autocrlf", "true")
+    hsConfig.save()
 
     println("Git started... starting webserver...")
     embeddedServer(Netty,2703) {
@@ -94,21 +93,25 @@ fun main(args: Array<String>) {
                 val dataSignature = hmacMessage(data)
                 if(MessageDigest.isEqual(dataSignature.toByteArray(), hubSignature.toByteArray()))
                 {
+                    println("Valid request!")
                     call.respond(HttpStatusCode.OK, "")
                 } else {
-                    call.respond(HttpStatusCode.Unauthorized, "Invalid Hub Signature")
+                    call.respond(HttpStatusCode.Unauthorized, "Invalid Hub Signature ${dataSignature}")
                     return@post
                 }
 
+                println("Parsing JSON...")
                 val jsonData = Klaxon().parse<PullRequestEvent>(data)
+                println("Parsed!")
                 if(jsonData == null)
                 {
                     call.respond(HttpStatusCode.BadRequest, "Bad Request!")
                     return@post
                 }
 
-                if(jsonData.action == "closed" && jsonData.pull_request.merged && jsonData.base.ref == "alpha")
+                if(jsonData.action == "closed" && jsonData.pull_request.merged && jsonData.pull_request.base.ref == "alpha")
                 {
+                    println("Parsing PR")
                     val body = jsonData.pull_request.body
                     var clText = body.substring(body.indexOf("\uD83C\uDD91 ") + 3)
                     clText = clText.substring(0, body.indexOf("/\uD83C\uDD91"))
@@ -134,6 +137,7 @@ fun main(args: Array<String>) {
                         clFile.writeText(clYaml)
 
                         withContext(Dispatchers.IO) {
+                            println("Pulling...")
                             hsGit.pull()
                                 .setRemote("origin")
                                 .setTransportConfigCallback {
@@ -142,6 +146,7 @@ fun main(args: Array<String>) {
                                 .call()
 
                             runBlocking {
+                                println("Running scripts...")
                                 val repoPath = File("repo/").absolutePath
                                 generateChangelog(repoPath)
                             }
