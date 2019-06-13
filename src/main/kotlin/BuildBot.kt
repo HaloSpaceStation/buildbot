@@ -45,8 +45,8 @@ val SshSessionFactory = object : JschConfigSessionFactory() {
 }
 
 data class PullBase(val ref: String)
-data class PullRequest(val state: String, val body: String, val base: PullBase, val merged: Boolean)
-data class PullRequestEvent(val action: String, val pull_request: PullRequest, val number: Int)
+data class PullRequest(val state: String)
+data class PullRequestEvent(val action: String, val pull_request: PullRequest, val number: Int, val body: String, val merged: Boolean, val base: PullBase)
 
 fun generateChangelog(repoPath: String) {
     val command = ProcessBuilder().command("python", "$repoPath/tools/GenerateChangelog/ss13_genchangelog.py", "$repoPath/html/changelog.html", "$repoPath/html/changelogs")
@@ -54,7 +54,7 @@ fun generateChangelog(repoPath: String) {
 }
 
 fun hmacMessage(body: String): String {
-    return "sha1=${HmacUtils(HmacAlgorithms.HMAC_SHA_1, WEBHOOK_KEY).hmacHex(body)}"
+    return "sha1=${HmacUtils(HmacAlgorithms.HMAC_SHA_1, WEBHOOK_KEY).hmacHex(body.toByteArray(Charsets.ISO_8859_1))}"
 }
 
 fun main(args: Array<String>) {
@@ -96,7 +96,7 @@ fun main(args: Array<String>) {
                     println("Valid request!")
                     call.respond(HttpStatusCode.OK, "")
                 } else {
-                    call.respond(HttpStatusCode.Unauthorized, "Invalid Hub Signature ${dataSignature}")
+                    call.respond(HttpStatusCode.Unauthorized, "Invalid Hub Signature $dataSignature")
                     return@post
                 }
 
@@ -109,10 +109,10 @@ fun main(args: Array<String>) {
                     return@post
                 }
 
-                if(jsonData.action == "closed" && jsonData.pull_request.merged && jsonData.pull_request.base.ref == "alpha")
+                if(jsonData.action == "closed" && jsonData.merged && jsonData.base.ref == "alpha")
                 {
                     println("Parsing PR")
-                    val body = jsonData.pull_request.body
+                    val body = jsonData.body
                     var clText = body.substring(body.indexOf("\uD83C\uDD91 ") + 3)
                     clText = clText.substring(0, body.indexOf("/\uD83C\uDD91"))
                     val clList = clText.split('\n')
