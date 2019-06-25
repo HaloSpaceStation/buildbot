@@ -113,7 +113,7 @@ fun main(args: Array<String>) {
                 {
                     println("Parsing PR")
                     val body = jsonData.pull_request.body
-                    var clText = body.substring(body.indexOf(":cl: ") + 3)
+                    var clText = body.substring(body.indexOf(":cl: ") + 4)
                     clText = clText.substring(0, clText.indexOf("/:cl:"))
                     println("Text extracted")
                     val clList = clText.split('\n')
