@@ -132,7 +132,7 @@ fun main(args: Array<String>) {
                             changes:
                         """.trimIndent()
                         logEntries.forEach {
-                            clYaml += "\n  - ${it.split(':')[0]}: \"${it.split(": ")[1].replace(Regex("[^\\p{L}\\p{Z}]"), "")}\""
+                            clYaml += "\n  - ${it.split(':')[0]}: \"${it.split(": ")[1].replace(Regex("[^\\p{L}\\p{Z}\\p{N},.]"), "")}\""
                         }
                         val clFile = File("repo/html/changelogs/pr-${jsonData.number}-changes.yml")
                         clFile.writeText(clYaml)
