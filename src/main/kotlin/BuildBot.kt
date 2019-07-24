@@ -16,6 +16,9 @@ import io.ktor.server.netty.Netty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.apache.commons.codec.digest.HmacAlgorithms
 import org.apache.commons.codec.digest.HmacUtils
 import org.eclipse.jgit.api.Git
@@ -113,26 +116,29 @@ fun main(args: Array<String>) {
                 {
                     println("Parsing PR")
                     val body = jsonData.pull_request.body
-                    var clText = body.substring(body.indexOf(":cl: ") + 4)
-                    clText = clText.substring(0, clText.indexOf("/:cl:"))
-                    println("Text extracted")
-                    val clList = clText.split('\n')
-                    if(clList.size >= 2)
-                    {
-                        val author = clList[0]
-                        val logEntries = mutableListOf<String>()
-                        for (i in 1 until clList.size - 1)
-                        {
-                            logEntries += clList[i]
-                        }
+                    var clText = body.substring(body.indexOf(":cl:"))
+                    clText = clText.substring(0, clText.indexOf("/:cl:") + 5)
 
+                    val clLexer = ChangeLogLexer(CharStreams.fromString(clText))
+                    val clTokens = CommonTokenStream(clLexer)
+                    val clParser = ChangeLogParser(clTokens)
+                    val clWalker = ParseTreeWalker()
+                    val clListener = ChangeLog()
+                    clWalker.walk(clListener, clParser.changelog())
+
+                    val author = clListener.author
+                    val logEntries = clListener.entries
+
+                    if (logEntries.isNotEmpty() && author != "")
+                    {
+                        println("PR was parsed")
                         var clYaml = """
                             author: $author
                             delete-after: True
                             changes:
                         """.trimIndent()
-                        logEntries.forEach {
-                            clYaml += "\n  - ${it.split(':')[0]}: \"${it.split(": ")[1].replace(Regex("[^\\p{L}\\p{Z}\\p{N},.]"), "")}\""
+                        logEntries.forEach { (key, value) ->
+                            clYaml += "\n  - $key: \"${value.replace(Regex("[^\\p{L}\\p{Z}\\p{N},.]"), "")}\""
                         }
                         val clFile = File("repo/html/changelogs/pr-${jsonData.number}-changes.yml")
                         clFile.writeText(clYaml)
