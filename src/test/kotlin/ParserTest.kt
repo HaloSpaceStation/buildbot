@@ -94,4 +94,22 @@ class ParserTest {
 
         Assert.assertEquals(expected, clListener.entries)
     }
+
+    @Test
+    fun recognizesCLEmoji() {
+        val body ="""
+            🆑 AuthorName
+            rscadd: Entry
+            /🆑
+        """.trimIndent()
+
+        val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+        val clTokens = CommonTokenStream(clLexer)
+        val clParser = ChangeLogParser(clTokens)
+        val clWalker = ParseTreeWalker()
+        val clListener = ChangeLog()
+        clWalker.walk(clListener, clParser.changelog())
+
+        Assert.assertEquals("AuthorName", clListener.author)
+    }
 }

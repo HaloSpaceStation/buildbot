@@ -20,7 +20,7 @@ whitespace
 
 NEWLINE : '\r\n' | '\n' | '\r';
 
-BEGINCL : ':cl:';
+BEGINCL : ':cl:' | '\uD83C\uDD91' | '\u1F191';
 ENDCL   : '/'BEGINCL ;
 DIGITS   : [0-9]+;
 PUNCTUATION : [.,-];
