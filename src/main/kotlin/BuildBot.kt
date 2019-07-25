@@ -116,10 +116,8 @@ fun main(args: Array<String>) {
                 {
                     println("Parsing PR")
                     val body = jsonData.pull_request.body
-                    var clText = body.substring(body.indexOf(":cl:"))
-                    clText = clText.substring(0, clText.indexOf("/:cl:") + 5)
 
-                    val clLexer = ChangeLogLexer(CharStreams.fromString(clText))
+                    val clLexer = ChangeLogLexer(CharStreams.fromString(body))
                     val clTokens = CommonTokenStream(clLexer)
                     val clParser = ChangeLogParser(clTokens)
                     val clWalker = ParseTreeWalker()

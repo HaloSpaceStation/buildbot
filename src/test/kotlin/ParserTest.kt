@@ -18,7 +18,7 @@ class ParserTest {
         """.trimIndent()
 
         val expectedAuthor = "AuthorName"
-        val expectedEntries = mapOf("rscadd" to "Test Entry 1", "rscdel" to "Test Entry 2")
+        val expectedEntries = listOf(Pair("rscadd", "Test Entry 1"), Pair("rscdel", "Test Entry 2"))
 
         var clText = body.substring(body.indexOf(":cl:"))
         clText = clText.substring(0, clText.indexOf("/:cl:") + 5)
@@ -64,7 +64,7 @@ class ParserTest {
             rscadd :Entry 1
             /:cl:
         """.trimIndent()
-        val expected = mapOf("rscadd" to "Entry 1")
+        val expected = listOf(Pair("rscadd", "Entry 1"))
 
         val clLexer = ChangeLogLexer(CharStreams.fromString(body))
         val clTokens = CommonTokenStream(clLexer)
@@ -83,7 +83,7 @@ class ParserTest {
             rscadd : Entry 1
             /:cl:
         """.trimIndent()
-        val expected = mapOf("rscadd" to "Entry 1")
+        val expected = listOf(Pair("rscadd", "Entry 1"))
 
         val clLexer = ChangeLogLexer(CharStreams.fromString(body))
         val clTokens = CommonTokenStream(clLexer)
@@ -102,6 +102,7 @@ class ParserTest {
             rscadd: Entry
             /🆑
         """.trimIndent()
+        val entries = listOf(Pair("rscadd", "Entry"))
 
         val clLexer = ChangeLogLexer(CharStreams.fromString(body))
         val clTokens = CommonTokenStream(clLexer)
@@ -111,5 +112,29 @@ class ParserTest {
         clWalker.walk(clListener, clParser.changelog())
 
         Assert.assertEquals("AuthorName", clListener.author)
+        Assert.assertEquals(entries, clListener.entries)
+    }
+
+    @Test
+    fun readInPlace() {
+        val body = """
+            This is a bunch of text.
+            :cl: Author
+            rscadd: An entry
+            /:cl:
+            It has a change log embedded in it!
+        """.trimIndent()
+        val author = "Author"
+        val entries = mutableListOf(Pair("rscadd", "An entry"))
+
+        val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+        val clTokens = CommonTokenStream(clLexer)
+        val clParser = ChangeLogParser(clTokens)
+        val clWalker = ParseTreeWalker()
+        val clListener = ChangeLog()
+        clWalker.walk(clListener, clParser.changelog())
+
+        Assert.assertEquals(author, clListener.author)
+        Assert.assertEquals(entries, clListener.entries)
     }
 }

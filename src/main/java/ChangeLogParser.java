@@ -1,12 +1,15 @@
 // Generated from D:/GitHub/HaloStation Build Bot/src/main/antlr\ChangeLog.g4 by ANTLR 4.7.2
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
+
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class ChangeLogParser extends Parser {
@@ -93,8 +96,13 @@ public class ChangeLogParser extends Parser {
 
 	public static class ChangelogContext extends ParserRuleContext {
 		public TerminalNode BEGINCL() { return getToken(ChangeLogParser.BEGINCL, 0); }
-		public WhitespaceContext whitespace() {
-			return getRuleContext(WhitespaceContext.class,0);
+
+        public List<WhitespaceContext> whitespace() {
+            return getRuleContexts(WhitespaceContext.class);
+        }
+
+        public WhitespaceContext whitespace(int i) {
+            return getRuleContext(WhitespaceContext.class, i);
 		}
 		public AuthorContext author() {
 			return getRuleContext(AuthorContext.class,0);
@@ -122,20 +130,55 @@ public class ChangeLogParser extends Parser {
 		ChangelogContext _localctx = new ChangelogContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_changelog);
 		try {
+            int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(12);
+                setState(15);
+                _errHandler.sync(this);
+                _alt = getInterpreter().adaptivePredict(_input, 0, _ctx);
+                while (_alt != 1 && _alt != org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER) {
+                    if (_alt == 1 + 1) {
+                        {
+                            {
+                                setState(12);
+                                matchWildcard();
+                            }
+                        }
+                    }
+                    setState(17);
+                    _errHandler.sync(this);
+                    _alt = getInterpreter().adaptivePredict(_input, 0, _ctx);
+                }
+                setState(18);
 			match(BEGINCL);
-			setState(13);
+                setState(19);
 			whitespace();
-			setState(14);
+                setState(20);
 			author();
-			setState(15);
+                setState(21);
 			match(NEWLINE);
-			setState(16);
+                setState(22);
 			entries();
-			setState(17);
+                setState(23);
 			match(ENDCL);
+                setState(24);
+                whitespace();
+                setState(28);
+                _errHandler.sync(this);
+                _alt = getInterpreter().adaptivePredict(_input, 1, _ctx);
+                while (_alt != 1 && _alt != org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER) {
+                    if (_alt == 1 + 1) {
+                        {
+                            {
+                                setState(25);
+                                matchWildcard();
+                            }
+                        }
+                    }
+                    setState(30);
+                    _errHandler.sync(this);
+                    _alt = getInterpreter().adaptivePredict(_input, 1, _ctx);
+                }
 			}
 		}
 		catch (RecognitionException re) {
@@ -183,13 +226,13 @@ public class ChangeLogParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(20); 
+                setState(32);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(19);
+                    setState(31);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DIGITS) | (1L << PUNCTUATION) | (1L << TEXT))) != 0)) ) {
 				_errHandler.recoverInline(this);
@@ -201,7 +244,7 @@ public class ChangeLogParser extends Parser {
 				}
 				}
 				}
-				setState(22); 
+                setState(34);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DIGITS) | (1L << PUNCTUATION) | (1L << TEXT))) != 0) );
@@ -246,11 +289,11 @@ public class ChangeLogParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(24);
+                setState(36);
 			entry();
-			setState(25);
+                setState(37);
 			match(NEWLINE);
-			setState(26);
+                setState(38);
 			entry_tail();
 			}
 		}
@@ -310,21 +353,21 @@ public class ChangeLogParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(28);
+                setState(40);
 			match(TAG);
-			setState(29);
+                setState(41);
 			whitespace();
-			setState(30);
+                setState(42);
 			match(T__0);
-			setState(31);
+                setState(43);
 			whitespace();
-			setState(33); 
+                setState(45);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(32);
+                    setState(44);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DIGITS) | (1L << PUNCTUATION) | (1L << TEXT) | (1L << WHITESPACE))) != 0)) ) {
 				_errHandler.recoverInline(this);
@@ -336,7 +379,7 @@ public class ChangeLogParser extends Parser {
 				}
 				}
 				}
-				setState(35); 
+                setState(47);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DIGITS) | (1L << PUNCTUATION) | (1L << TEXT) | (1L << WHITESPACE))) != 0) );
@@ -375,13 +418,13 @@ public class ChangeLogParser extends Parser {
 		Entry_tailContext _localctx = new Entry_tailContext(_ctx, getState());
 		enterRule(_localctx, 8, RULE_entry_tail);
 		try {
-			setState(39);
+            setState(51);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case TAG:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(37);
+                    setState(49);
 				entries();
 				}
 				break;
@@ -425,13 +468,13 @@ public class ChangeLogParser extends Parser {
 		WhitespaceContext _localctx = new WhitespaceContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_whitespace);
 		try {
-			setState(43);
+            setState(55);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
+            switch (getInterpreter().adaptivePredict(_input, 5, _ctx)) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(41);
+                    setState(53);
 				match(WHITESPACE);
 				}
 				break;
@@ -454,18 +497,22 @@ public class ChangeLogParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\13\60\4\2\t\2\4\3"+
-		"\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\3\6"+
-		"\3\27\n\3\r\3\16\3\30\3\4\3\4\3\4\3\4\3\5\3\5\3\5\3\5\3\5\6\5$\n\5\r\5"+
-		"\16\5%\3\6\3\6\5\6*\n\6\3\7\3\7\5\7.\n\7\3\7\2\2\b\2\4\6\b\n\f\2\4\4\2"+
-		"\7\b\n\n\4\2\7\b\n\13\2-\2\16\3\2\2\2\4\26\3\2\2\2\6\32\3\2\2\2\b\36\3"+
-		"\2\2\2\n)\3\2\2\2\f-\3\2\2\2\16\17\7\5\2\2\17\20\5\f\7\2\20\21\5\4\3\2"+
-		"\21\22\7\4\2\2\22\23\5\6\4\2\23\24\7\6\2\2\24\3\3\2\2\2\25\27\t\2\2\2"+
-		"\26\25\3\2\2\2\27\30\3\2\2\2\30\26\3\2\2\2\30\31\3\2\2\2\31\5\3\2\2\2"+
-		"\32\33\5\b\5\2\33\34\7\4\2\2\34\35\5\n\6\2\35\7\3\2\2\2\36\37\7\t\2\2"+
-		"\37 \5\f\7\2 !\7\3\2\2!#\5\f\7\2\"$\t\3\2\2#\"\3\2\2\2$%\3\2\2\2%#\3\2"+
-		"\2\2%&\3\2\2\2&\t\3\2\2\2\'*\5\6\4\2(*\3\2\2\2)\'\3\2\2\2)(\3\2\2\2*\13"+
-		"\3\2\2\2+.\7\13\2\2,.\3\2\2\2-+\3\2\2\2-,\3\2\2\2.\r\3\2\2\2\6\30%)-";
+            "\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\13<\4\2\t\2\4\3\t" +
+                    "\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\3\2\7\2\20\n\2\f\2\16\2\23\13\2\3\2" +
+                    "\3\2\3\2\3\2\3\2\3\2\3\2\3\2\7\2\35\n\2\f\2\16\2 \13\2\3\3\6\3#\n\3\r" +
+                    "\3\16\3$\3\4\3\4\3\4\3\4\3\5\3\5\3\5\3\5\3\5\6\5\60\n\5\r\5\16\5\61\3" +
+                    "\6\3\6\5\6\66\n\6\3\7\3\7\5\7:\n\7\3\7\4\21\36\2\b\2\4\6\b\n\f\2\4\4\2" +
+                    "\7\b\n\n\4\2\7\b\n\13\2;\2\21\3\2\2\2\4\"\3\2\2\2\6&\3\2\2\2\b*\3\2\2" +
+                    "\2\n\65\3\2\2\2\f9\3\2\2\2\16\20\13\2\2\2\17\16\3\2\2\2\20\23\3\2\2\2" +
+                    "\21\22\3\2\2\2\21\17\3\2\2\2\22\24\3\2\2\2\23\21\3\2\2\2\24\25\7\5\2\2" +
+                    "\25\26\5\f\7\2\26\27\5\4\3\2\27\30\7\4\2\2\30\31\5\6\4\2\31\32\7\6\2\2" +
+                    "\32\36\5\f\7\2\33\35\13\2\2\2\34\33\3\2\2\2\35 \3\2\2\2\36\37\3\2\2\2" +
+                    "\36\34\3\2\2\2\37\3\3\2\2\2 \36\3\2\2\2!#\t\2\2\2\"!\3\2\2\2#$\3\2\2\2" +
+                    "$\"\3\2\2\2$%\3\2\2\2%\5\3\2\2\2&\'\5\b\5\2\'(\7\4\2\2()\5\n\6\2)\7\3" +
+                    "\2\2\2*+\7\t\2\2+,\5\f\7\2,-\7\3\2\2-/\5\f\7\2.\60\t\3\2\2/.\3\2\2\2\60" +
+                    "\61\3\2\2\2\61/\3\2\2\2\61\62\3\2\2\2\62\t\3\2\2\2\63\66\5\6\4\2\64\66" +
+                    "\3\2\2\2\65\63\3\2\2\2\65\64\3\2\2\2\66\13\3\2\2\2\67:\7\13\2\28:\3\2" +
+                    "\2\29\67\3\2\2\298\3\2\2\2:\r\3\2\2\2\b\21\36$\61\659";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

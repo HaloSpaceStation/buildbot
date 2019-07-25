@@ -2,7 +2,7 @@ grammar ChangeLog;
 
 // Parser Rules
 
-changelog   : BEGINCL whitespace author NEWLINE entries ENDCL;
+changelog   : .*? BEGINCL whitespace author NEWLINE entries ENDCL whitespace .*?;
 
 author
     : (TEXT | DIGITS | PUNCTUATION)+;
