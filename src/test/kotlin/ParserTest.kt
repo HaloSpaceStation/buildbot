@@ -1,5 +1,6 @@
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.NoViableAltException
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.junit.Assert
 import org.junit.Test
@@ -136,5 +137,24 @@ class ParserTest {
 
         Assert.assertEquals(author, clListener.author)
         Assert.assertEquals(entries, clListener.entries)
+    }
+
+    @Test(expected = NoViableAltException::class)
+    fun failOnBadTag() {
+        val body = """
+            :cl: Author
+            rscadd: A usable entry
+            bad: This is an unusable entry
+            anotherBad: This one is also unusable
+            /:cl:
+        """.trimIndent()
+
+        val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+        val clTokens = CommonTokenStream(clLexer)
+        val clParser = ChangeLogParser(clTokens)
+        val clWalker = ParseTreeWalker()
+        val clListener = ChangeLog()
+        clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
+        clWalker.walk(clListener, clParser.changelog())
     }
 }

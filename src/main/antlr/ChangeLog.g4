@@ -2,18 +2,19 @@ grammar ChangeLog;
 
 // Parser Rules
 
-changelog   : .*? BEGINCL whitespace author NEWLINE entries ENDCL whitespace .*?;
+changelog   : anything BEGINCL whitespace author NEWLINE entries ENDCL anything;
 
 author
-    : (TEXT | DIGITS | PUNCTUATION)+;
+    : STRING;
 entries : entry NEWLINE entry_tail;
-entry   : TAG whitespace ':' whitespace (TEXT | DIGITS | PUNCTUATION | WHITESPACE)+;
+entry   : TAG whitespace ':' whitespace (STRING | WHITESPACE)+;
 entry_tail
     : entries
     |/* nothing */;
 whitespace
     : WHITESPACE
     | ;
+anything : (STRING | WHITESPACE | NEWLINE | ERRORTOKEN)* ;
 
 
 // Lexer Rules
@@ -22,8 +23,8 @@ NEWLINE : '\r\n' | '\n' | '\r';
 
 BEGINCL : ':cl:' | '\uD83C\uDD91' | '\u1F191';
 ENDCL   : '/'BEGINCL ;
-DIGITS   : [0-9]+;
-PUNCTUATION : [.,-];
+fragment DIGITS   : [0-9]+;
+fragment PUNCTUATION : [.,-];
 
 TAG
     : 'bugfix'
@@ -39,6 +40,10 @@ TAG
     | 'spellcheck'
     | 'experiment' ;
 
-TEXT    : [a-zA-Z]+;
+fragment TEXT    : [a-zA-Z]+ ;
+
+STRING: (TEXT | DIGITS | PUNCTUATION)+ ;
 
 WHITESPACE : ' ';
+
+ERRORTOKEN: . ;

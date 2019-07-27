@@ -60,6 +60,18 @@ fun hmacMessage(body: String): String {
     return "sha1=${HmacUtils(HmacAlgorithms.HMAC_SHA_1, WEBHOOK_KEY).hmacHex(body.toByteArray())}"
 }
 
+fun walkChangelog(body: String): ChangeLog {
+    val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+    val clTokens = CommonTokenStream(clLexer)
+    val clParser = ChangeLogParser(clTokens)
+    val clWalker = ParseTreeWalker()
+    val clListener = ChangeLog()
+    clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
+    clWalker.walk(clListener, clParser.changelog())
+
+    return clListener
+}
+
 fun main(args: Array<String>) {
     val hsRepo = FileRepositoryBuilder.create(File("repo/.git"))
     var hsGit: Git
@@ -117,12 +129,7 @@ fun main(args: Array<String>) {
                     println("Parsing PR")
                     val body = jsonData.pull_request.body
 
-                    val clLexer = ChangeLogLexer(CharStreams.fromString(body))
-                    val clTokens = CommonTokenStream(clLexer)
-                    val clParser = ChangeLogParser(clTokens)
-                    val clWalker = ParseTreeWalker()
-                    val clListener = ChangeLog()
-                    clWalker.walk(clListener, clParser.changelog())
+                    val clListener = walkChangelog(body)
 
                     val author = clListener.author
                     val logEntries = clListener.entries
