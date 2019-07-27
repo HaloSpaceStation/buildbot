@@ -7,6 +7,7 @@ buildscript {
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.31'
+    id 'antlr'
 }
 
 group 'org.projectunsc'
@@ -29,8 +30,7 @@ dependencies {
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.12'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
-    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
+    antlr "org.antlr:antlr4:4.7.2"
 }
 
 compileKotlin {
