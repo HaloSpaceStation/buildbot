@@ -111,7 +111,7 @@ fun main(args: Array<String>) {
                     println("Valid request!")
                     call.respond(HttpStatusCode.OK, "")
                 } else {
-                    call.respond(HttpStatusCode.Unauthorized, "Invalid Hub Signature $dataSignature")
+                    call.respond(HttpStatusCode.Unauthorized, "Invalid Hub Signature")
                     return@post
                 }
 
@@ -126,7 +126,7 @@ fun main(args: Array<String>) {
 		
                 if(jsonData.action == "closed" && jsonData.pull_request.merged && jsonData.pull_request.base.ref == "alpha")
                 {
-                    println("Parsing PR")
+                    println("Parsing PR ${jsonData.number}")
                     val body = jsonData.pull_request.body
 
                     val clListener = walkChangelog(body)
@@ -136,7 +136,7 @@ fun main(args: Array<String>) {
 
                     if (logEntries.isNotEmpty() && author != "")
                     {
-                        println("PR was parsed")
+                        println("PR ${jsonData.number} was parsed")
                         var clYaml = """
                             author: $author
                             delete-after: True
