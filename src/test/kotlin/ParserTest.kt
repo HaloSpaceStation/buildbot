@@ -119,7 +119,7 @@ class ParserTest {
     @Test
     fun readInPlace() {
         val body = """
-            This is a bunch of text.
+            This is a bunch of text:
             :cl: Author
             rscadd: An entry
             /:cl:
@@ -133,6 +133,7 @@ class ParserTest {
         val clParser = ChangeLogParser(clTokens)
         val clWalker = ParseTreeWalker()
         val clListener = ChangeLog()
+        clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
         clWalker.walk(clListener, clParser.changelog())
 
         Assert.assertEquals(author, clListener.author)

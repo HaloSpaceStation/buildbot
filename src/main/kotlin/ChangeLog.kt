@@ -1,7 +1,4 @@
-import org.antlr.v4.runtime.DefaultErrorStrategy
-import org.antlr.v4.runtime.NoViableAltException
-import org.antlr.v4.runtime.Parser
-import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.*
 
 class ChangeLog : ChangeLogBaseListener() {
 
@@ -23,6 +20,21 @@ class ChangeLog : ChangeLogBaseListener() {
             if (e is NoViableAltException) {
                 throw NoViableAltException(recognizer)
             }
+            return super.recover(recognizer, e)
+        }
+
+        override fun recoverInline(recognizer: Parser?): Token {
+            if (recognizer?.currentToken?.text == ":" && recognizer.ruleContext.ruleIndex == recognizer.getRuleIndex("changelog")) {
+                recognizer.consume()
+                while (recognizer.currentToken.type != ChangeLogParser.STRING && recognizer.currentToken.type != ChangeLogParser.WHITESPACE
+                    && recognizer.currentToken.type != ChangeLogParser.EOF
+                ) {
+                    recognizer.consume()
+                }
+                reportMatch(recognizer)
+                return recognizer.currentToken
+            }
+            return super.recoverInline(recognizer)
         }
 
     }
