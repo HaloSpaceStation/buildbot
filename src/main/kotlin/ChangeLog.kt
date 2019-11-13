@@ -24,15 +24,20 @@ class ChangeLog : ChangeLogBaseListener() {
         }
 
         override fun recoverInline(recognizer: Parser?): Token {
-            if (recognizer?.currentToken?.text == ":" && recognizer.ruleContext.ruleIndex == recognizer.getRuleIndex("changelog")) {
-                recognizer.consume()
-                while (recognizer.currentToken.type != ChangeLogParser.STRING && recognizer.currentToken.type != ChangeLogParser.WHITESPACE
-                    && recognizer.currentToken.type != ChangeLogParser.EOF
+            if (recognizer != null && recognizer.ruleContext.ruleIndex == recognizer.getRuleIndex("changelog")) {
+                recognizer.consume() //Gobble the bad token
+                while (recognizer.tokenStream.LA(1) != ChangeLogParser.BEGINCL && recognizer.tokenStream.LA(1) != ChangeLogParser.EOF
                 ) {
+                    // Since we're still in the start rule, continue to gobble tokens until the we find something
+                    // or run out of input
                     recognizer.consume()
                 }
-                reportMatch(recognizer)
-                return recognizer.currentToken
+                if (recognizer.tokenStream.LA(1) == ChangeLogParser.BEGINCL) {
+                    //We've found the start of a changelog
+                    recognizer.consume()
+                    reportMatch(recognizer)
+                    return recognizer.currentToken
+                }
             }
             return super.recoverInline(recognizer)
         }

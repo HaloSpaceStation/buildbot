@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.NoViableAltException
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.junit.Assert
 import org.junit.Test
+import java.io.File
 
 class ParserTest {
 
@@ -157,5 +158,45 @@ class ParserTest {
         val clListener = ChangeLog()
         clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
         clWalker.walk(clListener, clParser.changelog())
+    }
+
+    @Test
+    fun testAgainstTemplateMessage() {
+        val body = File("test-data/template.txt").readText()
+        val author = "YourName"
+        val entries = mutableListOf(
+            Pair("rscadd", "Added a changelog editing system..."),
+            Pair("rscdel", "Killed innocent kittens.")
+        )
+
+        val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+        val clTokens = CommonTokenStream(clLexer)
+        val clParser = ChangeLogParser(clTokens)
+        val clWalker = ParseTreeWalker()
+        val clListener = ChangeLog()
+        clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
+        clWalker.walk(clListener, clParser.changelog())
+
+        Assert.assertEquals(author, clListener.author)
+        Assert.assertEquals(entries, clListener.entries)
+    }
+
+    @Test
+    fun testNoChangelog() {
+        val body = """
+            A PR without a CL. 
+            It even includes <-- Some special: symbols/in it!-->
+        """.trimIndent()
+
+        val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+        val clTokens = CommonTokenStream(clLexer)
+        val clParser = ChangeLogParser(clTokens)
+        val clWalker = ParseTreeWalker()
+        val clListener = ChangeLog()
+        clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
+        clWalker.walk(clListener, clParser.changelog())
+
+        Assert.assertEquals("", clListener.author)
+        Assert.assertEquals(emptyList<Pair<String, String>>(), clListener.entries)
     }
 }
