@@ -199,4 +199,25 @@ class ParserTest {
         Assert.assertEquals("", clListener.author)
         Assert.assertEquals(emptyList<Pair<String, String>>(), clListener.entries)
     }
+
+    @Test
+    fun testUnparseableSymbolInEntryText() {
+        val body = """
+            :cl: Author
+            rscadd: This entry has a : in it!
+            tweak: after bad
+            /:cl:
+        """.trimIndent()
+
+        val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+        val clTokens = CommonTokenStream(clLexer)
+        val clParser = ChangeLogParser(clTokens)
+        val clWalker = ParseTreeWalker()
+        val clListener = ChangeLog()
+        clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
+        clWalker.walk(clListener, clParser.changelog())
+
+        Assert.assertEquals("Author", clListener.author)
+        Assert.assertEquals(listOf(Pair("rscadd", "This entry has a"), Pair("tweak", "after bad")), clListener.entries)
+    }
 }

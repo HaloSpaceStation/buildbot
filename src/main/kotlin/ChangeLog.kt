@@ -23,8 +23,8 @@ class ChangeLog : ChangeLogBaseListener() {
             return super.recover(recognizer, e)
         }
 
-        override fun recoverInline(recognizer: Parser?): Token {
-            if (recognizer != null && recognizer.ruleContext.ruleIndex == recognizer.getRuleIndex("changelog")) {
+        override fun recoverInline(recognizer: Parser): Token {
+            if (recognizer.ruleContext.ruleIndex == recognizer.getRuleIndex("changelog")) {
                 recognizer.consume() //Gobble the bad token
                 while (recognizer.tokenStream.LA(1) != ChangeLogParser.BEGINCL && recognizer.tokenStream.LA(1) != ChangeLogParser.EOF
                 ) {
@@ -38,6 +38,12 @@ class ChangeLog : ChangeLogBaseListener() {
                     reportMatch(recognizer)
                     return recognizer.currentToken
                 }
+            } else if (recognizer.ruleContext.ruleIndex == recognizer.getRuleIndex("entries")) {
+                recognizer.consume()
+                while (recognizer.tokenStream.LA(1) != ChangeLogParser.NEWLINE && recognizer.tokenStream.LA(1) != ChangeLogParser.EOF) {
+                    recognizer.ruleContext.addChild(recognizer.consume())
+                }
+                return recognizer.consume()
             }
             return super.recoverInline(recognizer)
         }
