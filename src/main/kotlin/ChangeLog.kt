@@ -10,8 +10,8 @@ class ChangeLog : ChangeLogBaseListener() {
     }
 
     override fun exitEntry(ctx: ChangeLogParser.EntryContext) {
-        val text = ctx.text
-        this.entries.add(Pair(text.split(':')[0].trim(), text.split(':')[1].trim()))
+        val text = ctx.text.split(':')
+        this.entries.add(Pair(text[0].trim(), text.takeLast(text.size - 1).joinToString(":").trim()))
     }
 
     class ChangeLogErrorStrategy : DefaultErrorStrategy() {

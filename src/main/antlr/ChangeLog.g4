@@ -7,7 +7,7 @@ changelog   : anything BEGINCL whitespace author NEWLINE entries ENDCL anything;
 author
     : STRING;
 entries : entry NEWLINE entry_tail;
-entry   : TAG whitespace ':' whitespace (STRING | WHITESPACE)+;
+entry   : TAG whitespace COLON whitespace (STRING | WHITESPACE | COLON)+;
 entry_tail
     : entries
     |/* nothing */;
@@ -25,6 +25,7 @@ BEGINCL : ':cl:' | '\uD83C\uDD91' | '\u1F191';
 ENDCL   : '/'BEGINCL ;
 fragment DIGITS   : [0-9]+;
 fragment PUNCTUATION : [.,-];
+COLON : ':';
 
 TAG
     : 'bugfix'
