@@ -244,4 +244,29 @@ class ParserTest {
             clListener.entries
         )
     }
+
+    @Test
+    fun testNoAuthorGiven() {
+        val body = """
+            Let's not have an author this time
+            :cl:
+            rscadd: Add something
+            rscdel: Remove something
+            /:cl:
+        """.trimIndent()
+
+        val clLexer = ChangeLogLexer(CharStreams.fromString(body))
+        val clTokens = CommonTokenStream(clLexer)
+        val clParser = ChangeLogParser(clTokens)
+        val clWalker = ParseTreeWalker()
+        val clListener = ChangeLog()
+        clParser.errorHandler = ChangeLog.ChangeLogErrorStrategy()
+        clWalker.walk(clListener, clParser.changelog())
+
+        Assert.assertEquals("", clListener.author)
+        Assert.assertEquals(
+            listOf(Pair("rscadd", "Add something"), Pair("rscdel", "Remove something")),
+            clListener.entries
+        )
+    }
 }
