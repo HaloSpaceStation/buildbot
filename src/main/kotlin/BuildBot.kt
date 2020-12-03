@@ -1,18 +1,13 @@
 import com.beust.klaxon.Klaxon
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
-import io.ktor.application.call
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.header
-import io.ktor.request.receive
-import io.ktor.response.respond
-import io.ktor.response.respondText
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.routing
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.request.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -52,7 +47,15 @@ val SshSessionFactory = object : JschConfigSessionFactory() {
 val changelogLock = ReentrantLock()
 
 data class PullBase(val ref: String)
-data class PullRequest(val state: String, val body: String, val base: PullBase, val merged: Boolean)
+data class PullAuthor(val login: String)
+data class PullRequest(
+    val state: String,
+    val user: PullAuthor,
+    val body: String,
+    val base: PullBase,
+    val merged: Boolean
+)
+
 data class PullRequestEvent(val action: String, val pull_request: PullRequest, val number: Int)
 
 fun generateChangelog(repoPath: String) {
@@ -137,8 +140,12 @@ fun main(args: Array<String>) {
 
                     val clListener = walkChangelog(body)
 
-                    val author = clListener.author
+                    var author = clListener.author
                     val logEntries = clListener.entries
+
+                    if (author == "") {
+                        author = jsonData.pull_request.user.login
+                    }
 
                     if (logEntries.isNotEmpty() && author != "") {
                         println("PR ${jsonData.number} was parsed")
