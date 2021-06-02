@@ -1,6 +1,4 @@
 import com.beust.klaxon.Klaxon
-import com.jcraft.jsch.JSch
-import com.jcraft.jsch.Session
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -20,25 +18,42 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.*
-import org.eclipse.jgit.util.FS
+import org.eclipse.jgit.transport.sshd.SshdSessionFactory
 import java.io.File
+import java.nio.file.Path
 import java.security.MessageDigest
 import java.util.concurrent.locks.ReentrantLock
 
 val WEBHOOK_KEY: String = System.getProperty("bot.webhook")
 
-val SshSessionFactory = object : JschConfigSessionFactory() {
+val SshSessionFactory = object : SshdSessionFactory() {
 
-    override fun createDefaultJSch(fs: FS?): JSch {
-        val default = super.createDefaultJSch(fs)
+    override fun getDefaultIdentities(sshDir: File?): MutableList<Path> {
+        return mutableListOf(File(System.getProperty("bot.keypath")).toPath())
+    }
+}
 
-        default.removeAllIdentity()
-        default.addIdentity(File(System.getProperty("bot.keypath")).absolutePath, System.getProperty("bot.keypass"))
-        return default
+val OurCredentialsProvider = object : CredentialsProvider() {
+    override fun isInteractive(): Boolean {
+        return false
     }
 
-    override fun configure(hc: OpenSshConfig.Host?, session: Session?) {
-        session?.setConfig("StrictHostKeyChecking", "no")
+    override fun supports(vararg items: CredentialItem?): Boolean {
+        return items.all { it is CredentialItem.Password || it is CredentialItem.InformationalMessage }
+    }
+
+    override fun get(uri: URIish, vararg items: CredentialItem?): Boolean {
+        if (uri.equals(File(System.getProperty("bot.keypath")).toURI())) {
+            (items.find { it is CredentialItem.Password } as? CredentialItem.Password)?.setValueNoCopy(
+                System.getProperty(
+                    "bot.keypass"
+                ).toCharArray()
+            )
+
+            return true
+        }
+
+        return false
     }
 
 }
@@ -95,6 +110,7 @@ fun main(args: Array<String>) {
             .setGitDir(File("repo/.git"))
             .setTransportConfigCallback {
                 (it as SshTransport).sshSessionFactory = SshSessionFactory
+                it.credentialsProvider = OurCredentialsProvider
             }
             .setBranchesToClone(listOf("refs/heads/alpha"))
             .setBranch("refs/heads/alpha").call()
@@ -168,6 +184,7 @@ fun main(args: Array<String>) {
                                     .setRemote("origin")
                                     .setTransportConfigCallback {
                                         (it as SshTransport).sshSessionFactory = SshSessionFactory
+                                        it.credentialsProvider = OurCredentialsProvider
                                     }
                                     .call()
 
@@ -189,6 +206,7 @@ fun main(args: Array<String>) {
                                 push.refSpecs = listOf(RefSpec("refs/heads/alpha:refs/heads/alpha"))
                                 push.setTransportConfigCallback {
                                     (it as SshTransport).sshSessionFactory = SshSessionFactory
+                                    it.credentialsProvider = OurCredentialsProvider
                                 }
                                 try {
                                     push.call()

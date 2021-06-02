@@ -17,6 +17,10 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven {
+        name="jGit repo"
+        url="https://repo.eclipse.org/content/groups/releases/"
+    }
 }
 
 dependencies {
@@ -24,6 +28,7 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:$ktor_version"
     implementation "ch.qos.logback:logback-classic:1.2.3"
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.11.1.202105131744-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '5.11.1.202105131744-r'
     implementation 'com.beust:klaxon:5.5'
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
