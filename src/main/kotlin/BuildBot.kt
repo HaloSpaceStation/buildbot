@@ -35,11 +35,7 @@ val SshSessionFactory = object : SshdSessionFactory() {
 
 val OurCredentialsProvider = object : CredentialsProvider() {
 
-    val expectedKeyURI = URIish()
-
-    init {
-        expectedKeyURI.rawPath = System.getProperty("bot.keypath")
-    }
+    val expectedURI = URIish().setPath(System.getProperty("bot.keypath"))
 
     override fun isInteractive(): Boolean {
         return false
@@ -50,7 +46,7 @@ val OurCredentialsProvider = object : CredentialsProvider() {
     }
 
     override fun get(uri: URIish, vararg items: CredentialItem?): Boolean {
-        if (uri == expectedKeyURI) {
+        if (uri == expectedURI) {
             (items.find { it is CredentialItem.Password } as? CredentialItem.Password)?.setValueNoCopy(
                 System.getProperty(
                     "bot.keypass"
