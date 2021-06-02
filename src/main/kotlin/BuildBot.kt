@@ -108,9 +108,9 @@ fun main(args: Array<String>) {
             .setURI("git@github.com:HaloSpaceStation/HaloSpaceStation13.git")
             .setDirectory(File("repo/"))
             .setGitDir(File("repo/.git"))
+            .setCredentialsProvider(OurCredentialsProvider)
             .setTransportConfigCallback {
                 (it as SshTransport).sshSessionFactory = SshSessionFactory
-                it.credentialsProvider = OurCredentialsProvider
             }
             .setBranchesToClone(listOf("refs/heads/alpha"))
             .setBranch("refs/heads/alpha").call()
@@ -182,9 +182,9 @@ fun main(args: Array<String>) {
                                 println("Pulling...")
                                 hsGit.pull()
                                     .setRemote("origin")
+                                    .setCredentialsProvider(OurCredentialsProvider)
                                     .setTransportConfigCallback {
                                         (it as SshTransport).sshSessionFactory = SshSessionFactory
-                                        it.credentialsProvider = OurCredentialsProvider
                                     }
                                     .call()
 
@@ -204,9 +204,9 @@ fun main(args: Array<String>) {
 
                                 val push = hsGit.push()
                                 push.refSpecs = listOf(RefSpec("refs/heads/alpha:refs/heads/alpha"))
+                                push.setCredentialsProvider(OurCredentialsProvider)
                                 push.setTransportConfigCallback {
                                     (it as SshTransport).sshSessionFactory = SshSessionFactory
-                                    it.credentialsProvider = OurCredentialsProvider
                                 }
                                 try {
                                     push.call()
