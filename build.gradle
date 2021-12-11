@@ -1,12 +1,12 @@
 buildscript {
     ext.ktor_version = '1.6.0'
-    ext.kotlin_version = '1.5.10'
+    ext.kotlin_version = '1.5.31'
     
 }
 
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}"
     id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'antlr'
 }
@@ -27,14 +27,14 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"
-    implementation "ch.qos.logback:logback-classic:1.2.3"
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.11.1.202105131744-r'
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '5.11.1.202105131744-r'
+    implementation "ch.qos.logback:logback-classic:1.2.7"
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.0.0.202111291000-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '6.0.0.202111291000-r'
     implementation 'com.beust:klaxon:5.5'
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 
-    antlr "org.antlr:antlr4:4.9.2"
+    antlr "org.antlr:antlr4:4.9.3"
 }
 
 compileKotlin {

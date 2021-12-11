@@ -28,7 +28,7 @@ class ChangeLog : ChangeLogBaseListener() {
                 recognizer.consume() //Gobble the bad token
                 while (recognizer.tokenStream.LA(1) != ChangeLogParser.BEGINCL && recognizer.tokenStream.LA(1) != ChangeLogParser.EOF
                 ) {
-                    // Since we're still in the start rule, continue to gobble tokens until the we find something
+                    // Since we're still in the start rule, continue to gobble tokens until we find something
                     // or run out of input
                     recognizer.consume()
                 }
